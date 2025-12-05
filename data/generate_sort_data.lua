@@ -41,6 +41,7 @@ end
 -- generate random data of increasing sizes
 SIZE_INIT = 10
 -- SIZE_MAX = 1000000000 -- 1e9 (billion)
+-- SIZE_MAX = 100000
 SIZE_MAX = 10
 VALUE_MAX = 10000
 
@@ -56,6 +57,8 @@ while size < SIZE_MAX+1 do
     table.insert(new_given_int, math.random(1, VALUE_MAX))
   end
 
+  -- TODO: fix. 'table.clone' does not work with large lists, gives error
+  -- "too many results to unpack"
   local new_expected_float = table.clone(new_given_float)
   table.sort(new_expected_float)
   local new_expected_int = table.clone(new_given_int)
@@ -89,8 +92,11 @@ for _, value in ipairs(random_cases) do
     print(y)
   end
 end
--- combine the tables. confusing syntax... 
-table.move(random_cases, 1, #random_cases, #corner_cases + 1, corner_cases)
+-- combine the tables
+local all_cases = {}
+-- confusing syntax...
+table.move(corner_cases, 1, #corner_cases, 1, all_cases)
+table.move(random_cases, 1, #random_cases, #all_cases + 1, all_cases)
 
 print("corner cases (AFTER MOVING!):")
 for _, value in ipairs(corner_cases) do
@@ -105,6 +111,17 @@ for _, value in ipairs(corner_cases) do
 end
 print("random cases (AFTER MOVING!):")
 for _, value in ipairs(random_cases) do
+  print("given:")
+  for _, y in ipairs(value.given) do
+    print(y)
+  end
+  print("expected:")
+  for _, y in ipairs(value.expected) do
+    print(y)
+  end
+end
+print("all cases (AFTER MOVING!):")
+for _, value in ipairs(all_cases) do
   print("given:")
   for _, y in ipairs(value.given) do
     print(y)
